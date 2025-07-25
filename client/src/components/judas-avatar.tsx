@@ -1,6 +1,6 @@
 export default function JudasAvatar({ className = "w-8 h-8" }: { className?: string }) {
   return (
-    <div className={`${className} rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center relative overflow-hidden`}>
+    <div className={`${className} rounded-full bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center relative overflow-hidden`}>
       <svg viewBox="0 0 100 100" className="w-full h-full">
         {/* Background */}
         <circle cx="50" cy="50" r="50" fill="url(#judasGradient)" />
@@ -31,8 +31,8 @@ export default function JudasAvatar({ className = "w-8 h-8" }: { className?: str
         
         <defs>
           <radialGradient id="judasGradient" cx="0.3" cy="0.3">
-            <stop offset="0%" stopColor="#fbbf24" />
-            <stop offset="100%" stopColor="#d97706" />
+            <stop offset="0%" stopColor="#f87171" />
+            <stop offset="100%" stopColor="#dc2626" />
           </radialGradient>
         </defs>
       </svg>

@@ -107,77 +107,63 @@ export default function ChatInterface({ onNewSession, selectedPersona }: ChatInt
     clearMessagesMutation.mutate();
   };
 
-  // Auto-typing effect component
-  const TypewriterText = ({ text, messageId }: { text: string; messageId: string }) => {
-    const [displayedText, setDisplayedText] = useState("");
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const [isComplete, setIsComplete] = useState(false);
-
-    // Check if this is the latest assistant message
-    const isLatestAssistantMessage = () => {
-      const assistantMessages = messages.filter(m => m.role === "assistant");
-      return assistantMessages.length > 0 && assistantMessages[assistantMessages.length - 1].id === messageId;
-    };
-
-    useEffect(() => {
-      // If not the latest message, show immediately
-      if (!isLatestAssistantMessage()) {
-        setDisplayedText(text);
-        setIsComplete(true);
-        setCurrentIndex(text.length);
-        return;
-      }
-
-      // Animate only the latest message
-      if (currentIndex < text.length) {
-        const timeout = setTimeout(() => {
-          setDisplayedText(prev => prev + text[currentIndex]);
-          setCurrentIndex(prev => prev + 1);
-        }, 30);
-        return () => clearTimeout(timeout);
-      } else if (currentIndex === text.length && !isComplete) {
-        setIsComplete(true);
-      }
-    }, [currentIndex, text, messageId, messages]);
-
-    // Reset animation when message changes
-    useEffect(() => {
-      setDisplayedText("");
-      setCurrentIndex(0);
-      setIsComplete(false);
-    }, [messageId]);
-
-    return (
-      <span className="relative">
-        {displayedText}
-        {!isComplete && isLatestAssistantMessage() && (
-          <span className="animate-pulse ml-1 text-yellow-400">|</span>
-        )}
-      </span>
-    );
+  // Get theme classes based on persona
+  const getThemeClasses = () => {
+    if (selectedPersona === "heavens-fang") {
+      return {
+        background: "bg-gray-50 dark:bg-gray-900",
+        headerBg: "bg-white/90 dark:bg-gray-800/90",
+        headerBorder: "border-blue-200 dark:border-blue-800",
+        accent: "text-blue-600 dark:text-blue-400",
+        accentBorder: "border-blue-300 dark:border-blue-600",
+        accentHover: "hover:bg-blue-50 dark:hover:bg-blue-900/20",
+        messageBg: "bg-white dark:bg-gray-800",
+        messageBorder: "border-blue-100 dark:border-blue-800",
+        userMessageBg: "bg-blue-50 dark:bg-blue-900/20",
+        userMessageBorder: "border-blue-200 dark:border-blue-700",
+        text: "text-gray-900 dark:text-gray-100",
+        mutedText: "text-gray-600 dark:text-gray-400",
+        avatar: "from-blue-400 to-blue-600"
+      };
+    } else {
+      return {
+        background: "bg-gray-900",
+        headerBg: "bg-gray-900/90",
+        headerBorder: "border-red-800",
+        accent: "text-red-400",
+        accentBorder: "border-red-600",
+        accentHover: "hover:bg-red-900/20",
+        messageBg: "bg-gray-800",
+        messageBorder: "border-red-800",
+        userMessageBg: "bg-red-900/20",
+        userMessageBorder: "border-red-700",
+        text: "text-gray-100",
+        mutedText: "text-gray-400",
+        avatar: "from-red-400 to-red-600"
+      };
+    }
   };
 
+  const theme = getThemeClasses();
+
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className={`min-h-screen flex flex-col ${theme.background}`}>
       {/* Header */}
-      <header className="border-b border-yellow-400/20 bg-gray-900/90 backdrop-blur-sm sticky top-0 z-50">
+      <header className={`border-b ${theme.headerBorder} ${theme.headerBg} backdrop-blur-sm sticky top-0 z-50`}>
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <motion.div
-              animate={{ opacity: [0.7, 1, 0.7] }}
-              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-            >
+            <div>
               {selectedPersona === "heavens-fang" ? (
                 <HeavensFangAvatar className="w-8 h-8" />
               ) : (
                 <JudasAvatar className="w-8 h-8" />
               )}
-            </motion.div>
+            </div>
             <div>
-              <h2 className="text-lg font-semibold text-gray-100">
+              <h2 className={`text-lg font-semibold ${theme.text}`}>
                 {selectedPersona === "heavens-fang" ? "Heaven's Fang" : "Judas"}
               </h2>
-              <p className="text-xs text-gray-400">
+              <p className={`text-xs ${theme.mutedText}`}>
                 {selectedPersona === "heavens-fang" ? "Psychological Analysis" : "Strategic Guidance"}
               </p>
             </div>
@@ -185,7 +171,7 @@ export default function ChatInterface({ onNewSession, selectedPersona }: ChatInt
           <button
             onClick={handleNewSession}
             disabled={clearMessagesMutation.isPending}
-            className="px-4 py-2 text-sm border border-yellow-400/30 rounded-lg text-yellow-400 hover:bg-yellow-400/10 transition-colors duration-200 flex items-center space-x-2 disabled:opacity-50"
+            className={`px-4 py-2 text-sm border ${theme.accentBorder} rounded-lg ${theme.accent} ${theme.accentHover} transition-colors duration-200 flex items-center space-x-2 disabled:opacity-50`}
           >
             <RotateCcw className="w-4 h-4" />
             <span>New Session</span>
@@ -210,30 +196,22 @@ export default function ChatInterface({ onNewSession, selectedPersona }: ChatInt
                 className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
               >
                 {message.role === "user" ? (
-                  <div className="max-w-lg backdrop-divine border border-yellow-400/30 rounded-2xl px-6 py-4">
-                    <p className="text-gray-100">{message.content}</p>
+                  <div className={`max-w-lg ${theme.userMessageBg} border ${theme.userMessageBorder} rounded-2xl px-6 py-4`}>
+                    <p className={theme.text}>{message.content}</p>
                   </div>
                 ) : (
                   <div className="max-w-2xl">
                     <div className="flex items-start space-x-3">
-                      <motion.div
-                        className="flex-shrink-0 mt-1"
-                        animate={{ opacity: [0.7, 1, 0.7] }}
-                        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                      >
+                      <div className="flex-shrink-0 mt-1">
                         {selectedPersona === "heavens-fang" ? (
                           <HeavensFangAvatar className="w-8 h-8" />
                         ) : (
                           <JudasAvatar className="w-8 h-8" />
                         )}
-                      </motion.div>
-                      <div className="backdrop-divine border border-gray-300/10 rounded-2xl px-6 py-4">
-                        <div className="text-gray-100 leading-relaxed">
-                          {message.role === "assistant" ? (
-                            <TypewriterText text={message.content} messageId={message.id} />
-                          ) : (
-                            message.content
-                          )}
+                      </div>
+                      <div className={`${theme.messageBg} border ${theme.messageBorder} rounded-2xl px-6 py-4`}>
+                        <div className={`${theme.text} leading-relaxed`}>
+                          {message.content}
                         </div>
                       </div>
                     </div>
@@ -251,40 +229,36 @@ export default function ChatInterface({ onNewSession, selectedPersona }: ChatInt
               className="flex justify-start"
             >
               <div className="flex items-start space-x-3">
-                <motion.div
-                  className="flex-shrink-0 mt-1"
-                  animate={{ opacity: [0.5, 1, 0.5] }}
-                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                >
+                <div className="flex-shrink-0 mt-1">
                   {selectedPersona === "heavens-fang" ? (
                     <HeavensFangAvatar className="w-8 h-8" />
                   ) : (
                     <JudasAvatar className="w-8 h-8" />
                   )}
-                </motion.div>
-                <div className="backdrop-divine border border-gray-300/10 rounded-2xl px-6 py-4">
+                </div>
+                <div className={`${theme.messageBg} border ${theme.messageBorder} rounded-2xl px-6 py-4`}>
                   <div className="flex items-center space-x-2">
                     <div className="flex space-x-1">
                       <motion.div
-                        className="w-2 h-2 bg-yellow-400 rounded-full"
+                        className={`w-2 h-2 rounded-full ${selectedPersona === "heavens-fang" ? "bg-blue-400" : "bg-red-400"}`}
                         animate={{ y: [0, -10, 0] }}
                         transition={{ duration: 0.6, repeat: Infinity, ease: "easeInOut" }}
                       />
                       <motion.div
-                        className="w-2 h-2 bg-yellow-400 rounded-full"
+                        className={`w-2 h-2 rounded-full ${selectedPersona === "heavens-fang" ? "bg-blue-400" : "bg-red-400"}`}
                         animate={{ y: [0, -10, 0] }}
                         transition={{ duration: 0.6, repeat: Infinity, ease: "easeInOut", delay: 0.1 }}
                       />
                       <motion.div
-                        className="w-2 h-2 bg-yellow-400 rounded-full"
+                        className={`w-2 h-2 rounded-full ${selectedPersona === "heavens-fang" ? "bg-blue-400" : "bg-red-400"}`}
                         animate={{ y: [0, -10, 0] }}
                         transition={{ duration: 0.6, repeat: Infinity, ease: "easeInOut", delay: 0.2 }}
                       />
                     </div>
-                    <span className="text-gray-400 text-sm">
+                    <span className={`${theme.mutedText} text-sm`}>
                       {selectedPersona === "heavens-fang" 
-                        ? "Analyzing psychological patterns..." 
-                        : "Calculating optimal path..."
+                        ? "Analyzing..." 
+                        : "Calculating..."
                       }
                     </span>
                   </div>
@@ -298,7 +272,7 @@ export default function ChatInterface({ onNewSession, selectedPersona }: ChatInt
       </main>
 
       {/* Input Area */}
-      <footer className="border-t border-yellow-400/20 bg-gray-900/90 backdrop-blur-sm">
+      <footer className={`border-t ${theme.headerBorder} ${theme.headerBg} backdrop-blur-sm`}>
         <div className="max-w-4xl mx-auto p-4">
           <form onSubmit={handleSubmit} className="relative">
             <textarea
@@ -306,15 +280,15 @@ export default function ChatInterface({ onNewSession, selectedPersona }: ChatInt
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Seek guidance..."
-              className="w-full px-6 py-4 pr-16 backdrop-divine border border-yellow-400/30 rounded-2xl text-gray-100 placeholder-gray-400 focus:outline-none focus:border-yellow-400 resize-none transition-all duration-300 min-h-[60px] max-h-[200px]"
+              placeholder={selectedPersona === "heavens-fang" ? "Share your thoughts..." : "State your goal..."}
+              className={`w-full px-6 py-4 pr-16 ${theme.messageBg} border ${theme.accentBorder} rounded-2xl ${theme.text} placeholder:${theme.mutedText} focus:outline-none focus:border-opacity-100 resize-none transition-all duration-300 min-h-[60px] max-h-[200px]`}
               rows={1}
               disabled={sendMessageMutation.isPending}
             />
             <motion.button
               type="submit"
               disabled={!inputValue.trim() || sendMessageMutation.isPending}
-              className="absolute right-3 bottom-3 w-10 h-10 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-xl flex items-center justify-center hover:scale-105 transition-transform duration-200 text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              className={`absolute right-3 bottom-3 w-10 h-10 bg-gradient-to-r ${theme.avatar} rounded-xl flex items-center justify-center hover:scale-105 transition-transform duration-200 text-white disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100`}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
