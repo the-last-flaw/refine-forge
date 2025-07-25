@@ -39,8 +39,10 @@ export default function Home() {
             transition={{ duration: 0.8, ease: "easeInOut" }}
           >
             <ChatInterface 
+              key={selectedPersona}
               onNewSession={handleNewSession} 
               selectedPersona={selectedPersona}
+              onPersonaChange={setSelectedPersona}
             />
           </motion.div>
         )}

@@ -11,9 +11,10 @@ import HeavensFangAvatar from "./heavens-fang-avatar";
 interface ChatInterfaceProps {
   onNewSession: () => void;
   selectedPersona: "judas" | "heavens-fang";
+  onPersonaChange?: (persona: "judas" | "heavens-fang") => void;
 }
 
-export default function ChatInterface({ onNewSession, selectedPersona }: ChatInterfaceProps) {
+export default function ChatInterface({ onNewSession, selectedPersona, onPersonaChange }: ChatInterfaceProps) {
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -168,14 +169,40 @@ export default function ChatInterface({ onNewSession, selectedPersona }: ChatInt
               </p>
             </div>
           </div>
-          <button
-            onClick={handleNewSession}
-            disabled={clearMessagesMutation.isPending}
-            className={`px-4 py-2 text-sm border ${theme.accentBorder} rounded-lg ${theme.accent} ${theme.accentHover} transition-colors duration-200 flex items-center space-x-2 disabled:opacity-50`}
-          >
-            <RotateCcw className="w-4 h-4" />
-            <span>New Session</span>
-          </button>
+          <div className="flex items-center space-x-3">
+            {onPersonaChange && (
+              <div className="flex border rounded-lg overflow-hidden">
+                <button
+                  onClick={() => onPersonaChange("judas")}
+                  className={`px-3 py-1 text-xs transition-colors duration-200 ${
+                    selectedPersona === "judas"
+                      ? "bg-red-500 text-white"
+                      : `${theme.text} hover:bg-red-500/20`
+                  }`}
+                >
+                  Judas
+                </button>
+                <button
+                  onClick={() => onPersonaChange("heavens-fang")}
+                  className={`px-3 py-1 text-xs transition-colors duration-200 ${
+                    selectedPersona === "heavens-fang"
+                      ? "bg-blue-500 text-white"
+                      : `${theme.text} hover:bg-blue-500/20`
+                  }`}
+                >
+                  Heaven's Fang
+                </button>
+              </div>
+            )}
+            <button
+              onClick={handleNewSession}
+              disabled={clearMessagesMutation.isPending}
+              className={`px-4 py-2 text-sm border ${theme.accentBorder} rounded-lg ${theme.accent} ${theme.accentHover} transition-colors duration-200 flex items-center space-x-2 disabled:opacity-50`}
+            >
+              <RotateCcw className="w-4 h-4" />
+              <span>New Session</span>
+            </button>
+          </div>
         </div>
       </header>
 

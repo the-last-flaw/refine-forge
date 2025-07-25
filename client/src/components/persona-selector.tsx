@@ -14,8 +14,8 @@ export default function PersonaSelector({ selectedPersona, onPersonaChange }: Pe
           onClick={() => onPersonaChange("judas")}
           className={`px-6 py-3 rounded-xl border-2 transition-all duration-300 ${
             selectedPersona === "judas"
-              ? "border-yellow-400 bg-yellow-400/10 text-yellow-400"
-              : "border-gray-600 bg-gray-800/50 text-gray-400 hover:border-yellow-400/50 hover:text-yellow-400/80"
+              ? "border-red-400 bg-red-400/10 text-red-400"
+              : "border-gray-600 bg-gray-800/50 text-gray-400 hover:border-red-400/50 hover:text-red-400/80"
           }`}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -30,8 +30,8 @@ export default function PersonaSelector({ selectedPersona, onPersonaChange }: Pe
           onClick={() => onPersonaChange("heavens-fang")}
           className={`px-6 py-3 rounded-xl border-2 transition-all duration-300 ${
             selectedPersona === "heavens-fang"
-              ? "border-yellow-400 bg-yellow-400/10 text-yellow-400"
-              : "border-gray-600 bg-gray-800/50 text-gray-400 hover:border-yellow-400/50 hover:text-yellow-400/80"
+              ? "border-blue-400 bg-blue-400/10 text-blue-400"
+              : "border-gray-600 bg-gray-800/50 text-gray-400 hover:border-blue-400/50 hover:text-blue-400/80"
           }`}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
