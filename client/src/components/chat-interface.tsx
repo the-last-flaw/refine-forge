@@ -107,61 +107,55 @@ export default function ChatInterface({ onNewSession, selectedPersona }: ChatInt
     clearMessagesMutation.mutate();
   };
 
-  // Auto-typing effect component - memoized to prevent re-renders
-  const TypewriterText = memo(({ text, messageId }: { text: string; messageId: string }) => {
+  // Auto-typing effect component
+  const TypewriterText = ({ text, messageId }: { text: string; messageId: string }) => {
     const [displayedText, setDisplayedText] = useState("");
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isComplete, setIsComplete] = useState(false);
-    const [hasStarted, setHasStarted] = useState(false);
+
+    // Check if this is the latest assistant message
+    const isLatestAssistantMessage = () => {
+      const assistantMessages = messages.filter(m => m.role === "assistant");
+      return assistantMessages.length > 0 && assistantMessages[assistantMessages.length - 1].id === messageId;
+    };
 
     useEffect(() => {
-      // Only animate if this is truly the latest message and animation hasn't started
-      const isLatestMessage = messages.length > 0 && messages[messages.length - 1].id === messageId;
-      
-      if (!isLatestMessage || hasStarted) {
-        if (!isLatestMessage && !hasStarted) {
-          setDisplayedText(text);
-          setIsComplete(true);
-        }
+      // If not the latest message, show immediately
+      if (!isLatestAssistantMessage()) {
+        setDisplayedText(text);
+        setIsComplete(true);
+        setCurrentIndex(text.length);
         return;
       }
 
-      // Start animation only once
-      if (!hasStarted) {
-        setHasStarted(true);
-        setDisplayedText("");
-        setCurrentIndex(0);
-        setIsComplete(false);
-      }
-
-      if (currentIndex < text.length && hasStarted) {
+      // Animate only the latest message
+      if (currentIndex < text.length) {
         const timeout = setTimeout(() => {
           setDisplayedText(prev => prev + text[currentIndex]);
           setCurrentIndex(prev => prev + 1);
         }, 30);
         return () => clearTimeout(timeout);
-      } else if (currentIndex === text.length && !isComplete && hasStarted) {
+      } else if (currentIndex === text.length && !isComplete) {
         setIsComplete(true);
       }
-    }, [currentIndex, text, isComplete, messageId, messages, hasStarted]);
+    }, [currentIndex, text, messageId, messages]);
 
-    // Only reset when the actual message content changes, not on re-renders
+    // Reset animation when message changes
     useEffect(() => {
       setDisplayedText("");
       setCurrentIndex(0);
       setIsComplete(false);
-      setHasStarted(false);
     }, [messageId]);
 
     return (
       <span className="relative">
         {displayedText}
-        {!isComplete && hasStarted && (
-          <span className="animate-pulse ml-1">|</span>
+        {!isComplete && isLatestAssistantMessage() && (
+          <span className="animate-pulse ml-1 text-yellow-400">|</span>
         )}
       </span>
     );
-  });
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
