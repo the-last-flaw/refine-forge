@@ -298,30 +298,68 @@ export default function ChatInterface({ onNewSession, selectedPersona, onPersona
         </div>
       </main>
 
-      {/* Input Area */}
+      {/* Input Area - Different designs for each persona */}
       <footer className={`border-t ${theme.headerBorder} ${theme.headerBg} backdrop-blur-sm`}>
         <div className="max-w-4xl mx-auto p-4">
-          <form onSubmit={handleSubmit} className="relative">
-            <textarea
-              ref={textareaRef}
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder={selectedPersona === "heavens-fang" ? "Share your thoughts..." : "State your goal..."}
-              className={`w-full px-6 py-4 pr-16 ${theme.messageBg} border ${theme.accentBorder} rounded-2xl ${theme.text} placeholder:${theme.mutedText} focus:outline-none focus:border-opacity-100 resize-none transition-all duration-300 min-h-[60px] max-h-[200px]`}
-              rows={1}
-              disabled={sendMessageMutation.isPending}
-            />
-            <motion.button
-              type="submit"
-              disabled={!inputValue.trim() || sendMessageMutation.isPending}
-              className={`absolute right-3 bottom-3 w-10 h-10 bg-gradient-to-r ${theme.avatar} rounded-xl flex items-center justify-center hover:scale-105 transition-transform duration-200 text-white disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Send className="w-5 h-5" />
-            </motion.button>
-          </form>
+          {selectedPersona === "judas" ? (
+            // Judas Input - Dark, aggressive, red accents
+            <form onSubmit={handleSubmit} className="relative">
+              <div className="relative bg-gradient-to-r from-red-950/30 to-black/50 rounded-2xl border border-red-800/50 p-1">
+                <textarea
+                  ref={textareaRef}
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Command your destiny..."
+                  className="w-full px-6 py-4 pr-16 bg-black/60 border border-red-700/30 rounded-xl text-red-100 placeholder:text-red-400/60 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20 resize-none transition-all duration-300 min-h-[60px] max-h-[200px] backdrop-blur-sm"
+                  rows={1}
+                  disabled={sendMessageMutation.isPending}
+                />
+                <motion.button
+                  type="submit"
+                  disabled={!inputValue.trim() || sendMessageMutation.isPending}
+                  className="absolute right-4 bottom-4 w-12 h-12 bg-gradient-to-r from-red-600 to-red-800 rounded-xl flex items-center justify-center shadow-lg shadow-red-500/25 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold"
+                  whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(239, 68, 68, 0.4)" }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Send className="w-5 h-5" />
+                </motion.button>
+              </div>
+              <div className="flex items-center justify-between mt-2 px-2">
+                <span className="text-xs text-red-400/70 font-medium">Strategic Command Interface</span>
+                <span className="text-xs text-red-400/50">Press Enter to send</span>
+              </div>
+            </form>
+          ) : (
+            // Heaven's Fang Input - Light, ethereal, blue accents
+            <form onSubmit={handleSubmit} className="relative">
+              <div className="relative bg-gradient-to-r from-blue-50/10 to-white/5 rounded-2xl border border-blue-300/30 p-1">
+                <textarea
+                  ref={textareaRef}
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Share what weighs on your mind..."
+                  className="w-full px-6 py-4 pr-16 bg-white/90 border border-blue-200/50 rounded-xl text-gray-800 placeholder:text-blue-400/60 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 resize-none transition-all duration-300 min-h-[60px] max-h-[200px] backdrop-blur-sm"
+                  rows={1}
+                  disabled={sendMessageMutation.isPending}
+                />
+                <motion.button
+                  type="submit"
+                  disabled={!inputValue.trim() || sendMessageMutation.isPending}
+                  className="absolute right-4 bottom-4 w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/25 disabled:opacity-50 disabled:cursor-not-allowed text-white"
+                  whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(59, 130, 246, 0.4)" }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Send className="w-5 h-5" />
+                </motion.button>
+              </div>
+              <div className="flex items-center justify-between mt-2 px-2">
+                <span className="text-xs text-blue-500/70 font-medium">Psychological Analysis Portal</span>
+                <span className="text-xs text-blue-400/50">Press Enter to send</span>
+              </div>
+            </form>
+          )}
         </div>
       </footer>
     </div>
