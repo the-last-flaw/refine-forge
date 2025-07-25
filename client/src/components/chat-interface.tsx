@@ -5,6 +5,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { ChatMessage } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
+import JudasAvatar from "./judas-avatar";
+import HeavensFangAvatar from "./heavens-fang-avatar";
 
 interface ChatInterfaceProps {
   onNewSession: () => void;
@@ -79,6 +81,13 @@ export default function ChatInterface({ onNewSession, selectedPersona }: ChatInt
     }
   }, [inputValue]);
 
+  // Send greeting when first entering chat and no messages exist
+  useEffect(() => {
+    if (messages && messages.length === 0 && !sendMessageMutation.isPending && !isLoading) {
+      sendMessageMutation.mutate("hello");
+    }
+  }, [messages, selectedPersona, isLoading]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (inputValue.trim() && !sendMessageMutation.isPending) {
@@ -99,12 +108,21 @@ export default function ChatInterface({ onNewSession, selectedPersona }: ChatInt
   };
 
   // Auto-typing effect component
-  const TypewriterText = ({ text }: { text: string }) => {
+  const TypewriterText = ({ text, messageId }: { text: string; messageId: string }) => {
     const [displayedText, setDisplayedText] = useState("");
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isComplete, setIsComplete] = useState(false);
 
     useEffect(() => {
+      // Only animate if this is truly the latest message
+      const isLatestMessage = messages.length > 0 && messages[messages.length - 1].id === messageId;
+      
+      if (!isLatestMessage) {
+        setDisplayedText(text);
+        setIsComplete(true);
+        return;
+      }
+
       if (currentIndex < text.length) {
         const timeout = setTimeout(() => {
           setDisplayedText(prev => prev + text[currentIndex]);
@@ -114,14 +132,14 @@ export default function ChatInterface({ onNewSession, selectedPersona }: ChatInt
       } else if (currentIndex === text.length && !isComplete) {
         setIsComplete(true);
       }
-    }, [currentIndex, text, isComplete]);
+    }, [currentIndex, text, isComplete, messageId, messages]);
 
     useEffect(() => {
-      // Reset when text changes
+      // Reset when text changes or message ID changes
       setDisplayedText("");
       setCurrentIndex(0);
       setIsComplete(false);
-    }, [text]);
+    }, [text, messageId]);
 
     return (
       <span className="relative">
@@ -140,10 +158,15 @@ export default function ChatInterface({ onNewSession, selectedPersona }: ChatInt
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <motion.div
-              className="w-8 h-8 rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600"
               animate={{ opacity: [0.7, 1, 0.7] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-            />
+            >
+              {selectedPersona === "heavens-fang" ? (
+                <HeavensFangAvatar className="w-8 h-8" />
+              ) : (
+                <JudasAvatar className="w-8 h-8" />
+              )}
+            </motion.div>
             <div>
               <h2 className="text-lg font-semibold text-gray-100">
                 {selectedPersona === "heavens-fang" ? "Heaven's Fang" : "Judas"}
@@ -188,14 +211,20 @@ export default function ChatInterface({ onNewSession, selectedPersona }: ChatInt
                   <div className="max-w-2xl">
                     <div className="flex items-start space-x-3">
                       <motion.div
-                        className="w-8 h-8 rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600 flex-shrink-0 mt-1"
+                        className="flex-shrink-0 mt-1"
                         animate={{ opacity: [0.7, 1, 0.7] }}
                         transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                      />
+                      >
+                        {selectedPersona === "heavens-fang" ? (
+                          <HeavensFangAvatar className="w-8 h-8" />
+                        ) : (
+                          <JudasAvatar className="w-8 h-8" />
+                        )}
+                      </motion.div>
                       <div className="backdrop-divine border border-gray-300/10 rounded-2xl px-6 py-4">
                         <div className="text-gray-100 leading-relaxed">
-                          {index === messages.length - 1 && message.role === "assistant" ? (
-                            <TypewriterText text={message.content} />
+                          {message.role === "assistant" ? (
+                            <TypewriterText text={message.content} messageId={message.id} />
                           ) : (
                             message.content
                           )}
@@ -217,10 +246,16 @@ export default function ChatInterface({ onNewSession, selectedPersona }: ChatInt
             >
               <div className="flex items-start space-x-3">
                 <motion.div
-                  className="w-8 h-8 rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600 flex-shrink-0 mt-1"
+                  className="flex-shrink-0 mt-1"
                   animate={{ opacity: [0.5, 1, 0.5] }}
                   transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                />
+                >
+                  {selectedPersona === "heavens-fang" ? (
+                    <HeavensFangAvatar className="w-8 h-8" />
+                  ) : (
+                    <JudasAvatar className="w-8 h-8" />
+                  )}
+                </motion.div>
                 <div className="backdrop-divine border border-gray-300/10 rounded-2xl px-6 py-4">
                   <div className="flex items-center space-x-2">
                     <div className="flex space-x-1">
