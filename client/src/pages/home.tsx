@@ -5,6 +5,7 @@ import ChatInterface from "../components/chat-interface";
 
 export default function Home() {
   const [currentView, setCurrentView] = useState<"landing" | "chat">("landing");
+  const [selectedPersona, setSelectedPersona] = useState<"judas" | "heavens-fang">("judas");
 
   const handleStartChat = () => {
     setCurrentView("chat");
@@ -24,7 +25,11 @@ export default function Home() {
             exit={{ opacity: 0, y: "-100vh" }}
             transition={{ duration: 0.8, ease: "easeInOut" }}
           >
-            <LandingInterface onStartChat={handleStartChat} />
+            <LandingInterface 
+              onStartChat={handleStartChat} 
+              selectedPersona={selectedPersona}
+              onPersonaChange={setSelectedPersona}
+            />
           </motion.div>
         ) : (
           <motion.div
@@ -33,7 +38,10 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeInOut" }}
           >
-            <ChatInterface onNewSession={handleNewSession} />
+            <ChatInterface 
+              onNewSession={handleNewSession} 
+              selectedPersona={selectedPersona}
+            />
           </motion.div>
         )}
       </AnimatePresence>

@@ -8,9 +8,10 @@ import { useToast } from "@/hooks/use-toast";
 
 interface ChatInterfaceProps {
   onNewSession: () => void;
+  selectedPersona: "judas" | "heavens-fang";
 }
 
-export default function ChatInterface({ onNewSession }: ChatInterfaceProps) {
+export default function ChatInterface({ onNewSession, selectedPersona }: ChatInterfaceProps) {
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -26,7 +27,7 @@ export default function ChatInterface({ onNewSession }: ChatInterfaceProps) {
   // Send message mutation
   const sendMessageMutation = useMutation({
     mutationFn: async (message: string) => {
-      const response = await apiRequest("POST", "/api/messages", { message });
+      const response = await apiRequest("POST", "/api/messages", { message, persona: selectedPersona });
       return response.json();
     },
     onSuccess: () => {
@@ -101,18 +102,35 @@ export default function ChatInterface({ onNewSession }: ChatInterfaceProps) {
   const TypewriterText = ({ text }: { text: string }) => {
     const [displayedText, setDisplayedText] = useState("");
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [isComplete, setIsComplete] = useState(false);
 
     useEffect(() => {
       if (currentIndex < text.length) {
         const timeout = setTimeout(() => {
           setDisplayedText(prev => prev + text[currentIndex]);
           setCurrentIndex(prev => prev + 1);
-        }, 50);
+        }, 30);
         return () => clearTimeout(timeout);
+      } else if (currentIndex === text.length && !isComplete) {
+        setIsComplete(true);
       }
-    }, [currentIndex, text]);
+    }, [currentIndex, text, isComplete]);
 
-    return <span>{displayedText}</span>;
+    useEffect(() => {
+      // Reset when text changes
+      setDisplayedText("");
+      setCurrentIndex(0);
+      setIsComplete(false);
+    }, [text]);
+
+    return (
+      <span className="relative">
+        {displayedText}
+        {!isComplete && (
+          <span className="animate-pulse ml-1">|</span>
+        )}
+      </span>
+    );
   };
 
   return (
@@ -127,8 +145,12 @@ export default function ChatInterface({ onNewSession }: ChatInterfaceProps) {
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             />
             <div>
-              <h2 className="text-lg font-semibold text-gray-100">Heaven's Fang</h2>
-              <p className="text-xs text-gray-400">Psychological Analysis</p>
+              <h2 className="text-lg font-semibold text-gray-100">
+                {selectedPersona === "heavens-fang" ? "Heaven's Fang" : "Judas"}
+              </h2>
+              <p className="text-xs text-gray-400">
+                {selectedPersona === "heavens-fang" ? "Psychological Analysis" : "Strategic Guidance"}
+              </p>
             </div>
           </div>
           <button
@@ -218,7 +240,12 @@ export default function ChatInterface({ onNewSession }: ChatInterfaceProps) {
                         transition={{ duration: 0.6, repeat: Infinity, ease: "easeInOut", delay: 0.2 }}
                       />
                     </div>
-                    <span className="text-gray-400 text-sm">Analyzing psychological patterns...</span>
+                    <span className="text-gray-400 text-sm">
+                      {selectedPersona === "heavens-fang" 
+                        ? "Analyzing psychological patterns..." 
+                        : "Calculating optimal path..."
+                      }
+                    </span>
                   </div>
                 </div>
               </div>

@@ -9,6 +9,7 @@ export const chatMessageSchema = z.object({
 
 export const sendMessageSchema = z.object({
   message: z.string().min(1, "Message cannot be empty"),
+  persona: z.enum(["judas", "heavens-fang"]).optional().default("judas"),
 });
 
 export type ChatMessage = z.infer<typeof chatMessageSchema>;

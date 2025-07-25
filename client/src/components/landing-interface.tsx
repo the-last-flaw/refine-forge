@@ -1,12 +1,15 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Send } from "lucide-react";
+import PersonaSelector from "./persona-selector";
 
 interface LandingInterfaceProps {
   onStartChat: () => void;
+  selectedPersona: "judas" | "heavens-fang";
+  onPersonaChange: (persona: "judas" | "heavens-fang") => void;
 }
 
-export default function LandingInterface({ onStartChat }: LandingInterfaceProps) {
+export default function LandingInterface({ onStartChat, selectedPersona, onPersonaChange }: LandingInterfaceProps) {
   const [inputValue, setInputValue] = useState("");
   const [currentSuggestionIndex, setCurrentSuggestionIndex] = useState(0);
 
@@ -87,14 +90,26 @@ export default function LandingInterface({ onStartChat }: LandingInterfaceProps)
       <div className="relative z-10 w-full max-w-2xl text-center">
         {/* Brand Identity */}
         <motion.div
-          className="mb-16"
+          className="mb-8"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
         >
-          <h1 className="text-6xl md:text-7xl font-bold mystical-gradient mb-4 tracking-tight">
-            Heaven's Fang
+          <h1 className="text-5xl md:text-6xl font-bold mystical-gradient mb-4 tracking-tight">
+            {selectedPersona === "heavens-fang" ? "Heaven's Fang" : "Judas"}
           </h1>
+        </motion.div>
+
+        {/* Persona Selector */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
+        >
+          <PersonaSelector 
+            selectedPersona={selectedPersona} 
+            onPersonaChange={onPersonaChange}
+          />
         </motion.div>
 
         {/* Central Input Field */}

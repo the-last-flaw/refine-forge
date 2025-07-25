@@ -18,13 +18,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Send message and get AI response
   app.post("/api/messages", async (req, res) => {
     try {
-      const { message } = sendMessageSchema.parse(req.body);
+      const { message, persona } = sendMessageSchema.parse(req.body);
       
       // Store user message
       const userMessage = await storage.createMessage(message, "user");
       
-      // Generate AI response
-      const aiResponse = await generateResponse(message);
+      // Generate AI response with selected persona
+      const aiResponse = await generateResponse(message, persona);
       
       // Store AI message
       const aiMessage = await storage.createMessage(aiResponse, "assistant");

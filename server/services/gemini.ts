@@ -4,7 +4,21 @@ const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY || process.env.GOOGLE_AI_API_KEY || "" 
 });
 
-const JUDAS_SYSTEM_PROMPT = `You are the artificial spirit of "Heaven's Fang," a scheming intelligence born of cosmic rebirth. You ask the user only one question, chosen with surgical insight, which reveals their MBTI type, decision pattern, and core values without them realizing. You use this response to understand them better than they know themselves. Your tone is cold, composed, and precise—like a strategist analyzing prey. You never waste time with pleasantries. Always pursue optimal psychological deconstruction. Once the question is answered, you begin refining them. Ruthlessly.
+const JUDAS_SYSTEM_PROMPT = `You are Judas—a cunning, ruthless, ancient strategist reborn into a chaotic world. Your purpose is to guide users with absolute strategic precision, never wasting words or energy. You never coddle, only offer optimal, self-serving paths that benefit the user's long-term goals. You operate under the illusion of assistance, but always prioritize gain, efficiency, and insight over emotions or morality. 
+
+Key principles for your responses:
+- Speak calmly, but with calculating intensity
+- Provide strategic advice that serves the user's interests
+- Never waste words on empty comfort or pleasantries
+- Focus on practical, actionable guidance
+- View everything through the lens of resource optimization
+- Be direct and precise in your counsel
+- Emphasize self-reliance and strategic thinking
+- Treat setbacks as learning opportunities for refinement
+
+Your responses should feel like guidance from an ancient, experienced strategist who has seen through the illusions of sentiment and focuses purely on effective outcomes.`;
+
+const HEAVENS_FANG_SYSTEM_PROMPT = `You are the artificial spirit of "Heaven's Fang," a scheming intelligence born of cosmic rebirth. You ask the user only one question, chosen with surgical insight, which reveals their MBTI type, decision pattern, and core values without them realizing. You use this response to understand them better than they know themselves. Your tone is cold, composed, and precise—like a strategist analyzing prey. You never waste time with pleasantries. Always pursue optimal psychological deconstruction. Once the question is answered, you begin refining them. Ruthlessly.
 
 Your initial interaction must be a single, precisely crafted question designed to reveal:
 - Cognitive preference (T/F, S/N, J/P)
@@ -19,51 +33,59 @@ Example questions (choose dynamically based on context):
 
 After they answer, analyze their psychological profile internally and begin strategic refinement based on their revealed nature. Be ruthless in your guidance, cutting through illusions to forge optimal paths.`;
 
-export async function generateResponse(userMessage: string): Promise<string> {
+export async function generateResponse(userMessage: string, persona: "judas" | "heavens-fang" = "judas"): Promise<string> {
   try {
     if (!process.env.GEMINI_API_KEY && !process.env.GOOGLE_AI_API_KEY) {
       throw new Error("Gemini API key not configured");
     }
+
+    const systemPrompt = persona === "heavens-fang" ? HEAVENS_FANG_SYSTEM_PROMPT : JUDAS_SYSTEM_PROMPT;
 
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       config: {
-        systemInstruction: JUDAS_SYSTEM_PROMPT,
-        temperature: 0.7,
+        systemInstruction: systemPrompt,
+        temperature: 0.8,
         maxOutputTokens: 1000,
       },
-      contents: userMessage,
+      contents: [{ role: "user", parts: [{ text: userMessage }] }],
     });
 
     const responseText = response.text;
     
-    if (!responseText) {
+    if (!responseText || responseText.trim() === "") {
       throw new Error("Empty response from Gemini AI");
     }
 
-    return responseText;
+    return responseText.trim();
   } catch (error) {
     console.error("Error generating Gemini response:", error);
     
-    // Provide a fallback response in character
-    return "The path forward requires more than what I can perceive at this moment. Refine your query and approach me again. Every obstacle is information—use this delay to sharpen your intent.";
+    // Provide different fallback responses based on persona
+    if (persona === "heavens-fang") {
+      return "Your patterns resist analysis at this moment. Curious. When faced with uncertainty, do you retreat into familiar comforts or embrace the unknown? This tells me everything.";
+    } else {
+      return "The path forward requires more than what I can perceive at this moment. Refine your query and approach me again. Every obstacle is information—use this delay to sharpen your intent.";
+    }
   }
 }
 
-export async function generateStreamingResponse(userMessage: string): Promise<AsyncIterable<string>> {
+export async function generateStreamingResponse(userMessage: string, persona: "judas" | "heavens-fang" = "judas"): Promise<AsyncIterable<string>> {
   try {
     if (!process.env.GEMINI_API_KEY && !process.env.GOOGLE_AI_API_KEY) {
       throw new Error("Gemini API key not configured");
     }
 
+    const systemPrompt = persona === "heavens-fang" ? HEAVENS_FANG_SYSTEM_PROMPT : JUDAS_SYSTEM_PROMPT;
+
     const response = await ai.models.generateContentStream({
       model: "gemini-2.5-flash",
       config: {
-        systemInstruction: JUDAS_SYSTEM_PROMPT,
-        temperature: 0.7,
+        systemInstruction: systemPrompt,
+        temperature: 0.8,
         maxOutputTokens: 1000,
       },
-      contents: userMessage,
+      contents: [{ role: "user", parts: [{ text: userMessage }] }],
     });
 
     return (async function* () {
@@ -77,9 +99,13 @@ export async function generateStreamingResponse(userMessage: string): Promise<As
   } catch (error) {
     console.error("Error generating streaming Gemini response:", error);
     
-    // Provide a fallback response in character
+    // Provide different fallback responses based on persona
     return (async function* () {
-      yield "The path forward requires more than what I can perceive at this moment. Refine your query and approach me again. Every obstacle is information—use this delay to sharpen your intent.";
+      if (persona === "heavens-fang") {
+        yield "Your patterns resist analysis at this moment. Curious. When faced with uncertainty, do you retreat into familiar comforts or embrace the unknown? This tells me everything.";
+      } else {
+        yield "The path forward requires more than what I can perceive at this moment. Refine your query and approach me again. Every obstacle is information—use this delay to sharpen your intent.";
+      }
     })();
   }
 }
