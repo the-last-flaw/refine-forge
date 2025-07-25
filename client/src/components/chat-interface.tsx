@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, memo } from "react";
 import { motion } from "framer-motion";
 import { Send, RotateCcw } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -107,49 +107,61 @@ export default function ChatInterface({ onNewSession, selectedPersona }: ChatInt
     clearMessagesMutation.mutate();
   };
 
-  // Auto-typing effect component
-  const TypewriterText = ({ text, messageId }: { text: string; messageId: string }) => {
+  // Auto-typing effect component - memoized to prevent re-renders
+  const TypewriterText = memo(({ text, messageId }: { text: string; messageId: string }) => {
     const [displayedText, setDisplayedText] = useState("");
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isComplete, setIsComplete] = useState(false);
+    const [hasStarted, setHasStarted] = useState(false);
 
     useEffect(() => {
-      // Only animate if this is truly the latest message
+      // Only animate if this is truly the latest message and animation hasn't started
       const isLatestMessage = messages.length > 0 && messages[messages.length - 1].id === messageId;
       
-      if (!isLatestMessage) {
-        setDisplayedText(text);
-        setIsComplete(true);
+      if (!isLatestMessage || hasStarted) {
+        if (!isLatestMessage && !hasStarted) {
+          setDisplayedText(text);
+          setIsComplete(true);
+        }
         return;
       }
 
-      if (currentIndex < text.length) {
+      // Start animation only once
+      if (!hasStarted) {
+        setHasStarted(true);
+        setDisplayedText("");
+        setCurrentIndex(0);
+        setIsComplete(false);
+      }
+
+      if (currentIndex < text.length && hasStarted) {
         const timeout = setTimeout(() => {
           setDisplayedText(prev => prev + text[currentIndex]);
           setCurrentIndex(prev => prev + 1);
         }, 30);
         return () => clearTimeout(timeout);
-      } else if (currentIndex === text.length && !isComplete) {
+      } else if (currentIndex === text.length && !isComplete && hasStarted) {
         setIsComplete(true);
       }
-    }, [currentIndex, text, isComplete, messageId, messages]);
+    }, [currentIndex, text, isComplete, messageId, messages, hasStarted]);
 
+    // Only reset when the actual message content changes, not on re-renders
     useEffect(() => {
-      // Reset when text changes or message ID changes
       setDisplayedText("");
       setCurrentIndex(0);
       setIsComplete(false);
-    }, [text, messageId]);
+      setHasStarted(false);
+    }, [messageId]);
 
     return (
       <span className="relative">
         {displayedText}
-        {!isComplete && (
+        {!isComplete && hasStarted && (
           <span className="animate-pulse ml-1">|</span>
         )}
       </span>
     );
-  };
+  });
 
   return (
     <div className="min-h-screen flex flex-col">
