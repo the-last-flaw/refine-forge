@@ -1,8 +1,8 @@
-# AI Chat Application - Judas Character
+# AI Chat Application - Heaven's Fang Character
 
 ## Overview
 
-This is a full-stack TypeScript chat application featuring an AI assistant based on the character "Judas" - a cunning, ruthless, ancient strategist. The application uses React for the frontend, Express.js for the backend, and integrates with Google's Gemini AI to provide character-consistent responses. The system is designed as a modern web application with real-time chat functionality and a mystical, dark-themed user interface with divine aesthetics.
+This is a full-stack TypeScript chat application featuring an AI assistant based on "Heaven's Fang" - a scheming intelligence born of cosmic rebirth. The AI employs psychological profiling through strategic questioning to understand users' MBTI types, decision patterns, and core values. The application uses React for the frontend, Express.js for the backend, and integrates with Google's Gemini AI to provide character-consistent responses with surgical psychological insight. The system features a mystical, dark-themed user interface with divine aesthetics.
 
 ## User Preferences
 
@@ -43,7 +43,7 @@ The application follows a monorepo structure with clear separation between clien
 1. **User Input**: User types message in chat interface
 2. **API Request**: Frontend sends POST request to `/api/messages`
 3. **Message Storage**: User message stored in memory storage
-4. **AI Processing**: Gemini AI generates response using Judas character prompt
+4. **AI Processing**: Gemini AI generates response using Heaven's Fang character prompt with psychological profiling
 5. **Response Storage**: AI response stored and both messages returned
 6. **UI Update**: Frontend updates chat display with new messages
 

@@ -127,8 +127,8 @@ export default function ChatInterface({ onNewSession }: ChatInterfaceProps) {
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             />
             <div>
-              <h2 className="text-lg font-semibold text-gray-100">Judas</h2>
-              <p className="text-xs text-gray-400">Strategic Guidance</p>
+              <h2 className="text-lg font-semibold text-gray-100">Heaven's Fang</h2>
+              <p className="text-xs text-gray-400">Psychological Analysis</p>
             </div>
           </div>
           <button
@@ -218,7 +218,7 @@ export default function ChatInterface({ onNewSession }: ChatInterfaceProps) {
                         transition={{ duration: 0.6, repeat: Infinity, ease: "easeInOut", delay: 0.2 }}
                       />
                     </div>
-                    <span className="text-gray-400 text-sm">Calculating optimal path...</span>
+                    <span className="text-gray-400 text-sm">Analyzing psychological patterns...</span>
                   </div>
                 </div>
               </div>

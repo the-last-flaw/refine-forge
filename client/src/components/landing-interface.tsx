@@ -11,12 +11,12 @@ export default function LandingInterface({ onStartChat }: LandingInterfaceProps)
   const [currentSuggestionIndex, setCurrentSuggestionIndex] = useState(0);
 
   const suggestions = [
-    "Patience is for the weak.",
-    "Everything is a resource.",
-    "Refine. Replace. Rise.",
-    "Power recognizes no mercy.",
-    "Adapt or be consumed.",
-    "Strategy over sentiment."
+    "I see through your pretenses.",
+    "Every choice reveals your nature.",
+    "Your patterns are predictable.",
+    "Truth lies in your hesitation.",
+    "Psychology is my weapon.",
+    "You cannot hide from analysis."
   ];
 
   useEffect(() => {
@@ -93,11 +93,8 @@ export default function LandingInterface({ onStartChat }: LandingInterfaceProps)
           transition={{ duration: 0.8, ease: "easeOut" }}
         >
           <h1 className="text-6xl md:text-7xl font-bold mystical-gradient mb-4 tracking-tight">
-            Judas
+            Heaven's Fang
           </h1>
-          <p className="text-lg md:text-xl text-gray-300 font-light tracking-wide">
-            Forge Your Path. No Mercy. Just Progress.
-          </p>
         </motion.div>
 
         {/* Central Input Field */}
